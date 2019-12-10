@@ -12,7 +12,6 @@ import java.util.AbstractList;
 public class MappingSheet<T> extends AbstractList<T> {
 
 
-
     @Override
     public T get(int index) {
         return null;

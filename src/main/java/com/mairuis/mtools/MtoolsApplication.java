@@ -1,6 +1,6 @@
 package com.mairuis.mtools;
 
-import com.mairuis.excel.ExcelAssistant;
+import com.mairuis.excel.ExcelWorker;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,6 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MtoolsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ExcelAssistant.class, args);
+        SpringApplication.run(ExcelWorker.class, args);
     }
 }

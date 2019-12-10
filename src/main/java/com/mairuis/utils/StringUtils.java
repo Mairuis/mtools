@@ -1,23 +1,22 @@
 package com.mairuis.utils;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- *
- *
  * @author Mairuis
  * @date 2019/12/8
  */
 public class StringUtils {
 
-    public int minDistance(String word1, String word2) {
+    public int minEditDistance(String word1, String word2) {
         int n = word1.length();
         int m = word2.length();
 
         if (n * m == 0)
             return n + m;
 
-        int [][] d = new int[n + 1][m + 1];
+        int[][] d = new int[n + 1][m + 1];
 
         for (int i = 0; i < n + 1; i++) {
             d[i][0] = i;
@@ -40,4 +39,11 @@ public class StringUtils {
         return d[n][m];
     }
 
+    public static Map<String, String> argsToMap(String[] args) {
+        Map<String, String> map = new HashMap<>(args.length);
+        for (String arg : args) {
+            map.put(arg.split("=")[0], arg.split("=")[1]);
+        }
+        return map;
+    }
 }

@@ -1,7 +1,7 @@
 package com.mairuis.excel.tools;
 
-import com.mairuis.excel.utils.Rows;
-import com.mairuis.excel.utils.Workbooks;
+import com.mairuis.excel.tools.utils.Rows;
+import com.mairuis.excel.tools.utils.Workbooks;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;

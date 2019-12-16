@@ -11,7 +11,7 @@ import org.springframework.boot.SpringApplication;
 public class ExcelWorkerTests {
 
     @Test
-    public void test() {
-        SpringApplication.run(ExcelWorker.class, "outFilePath=output/split", "filePath=Workbook.xls", "task=split", "sheet=Test");
+    public void testSplit() {
+        SpringApplication.run(ExcelWorker.class, "outFilePath=output/split", "filePath=data/Workbook.xls", "task=split", "sheet=Test");
     }
 }

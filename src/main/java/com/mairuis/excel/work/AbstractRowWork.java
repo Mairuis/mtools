@@ -1,7 +1,7 @@
 package com.mairuis.excel.work;
 
-import com.mairuis.excel.utils.Rows;
-import com.mairuis.excel.utils.Sheets;
+import com.mairuis.excel.tools.utils.Rows;
+import com.mairuis.excel.tools.utils.Sheets;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

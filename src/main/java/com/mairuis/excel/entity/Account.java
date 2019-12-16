@@ -1,11 +1,16 @@
 package com.mairuis.excel.entity;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 /**
  * 描述
  *
  * @author Mairuis
  * @date 2019/12/15
  */
+@Data
+@Accessors(chain = true)
 public class Account {
     private int rowNumber;
     private int month;

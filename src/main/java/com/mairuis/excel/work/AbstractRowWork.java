@@ -1,7 +1,5 @@
 package com.mairuis.excel.work;
 
-import com.mairuis.excel.tools.utils.Rows;
-import com.mairuis.excel.tools.utils.Sheets;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,32 +19,30 @@ public abstract class AbstractRowWork implements WorkStrategy {
     private static Logger LOGGER = LoggerFactory.getLogger(AbstractRowWork.class);
 
     @Override
-    public Workbook work(Map<String, String> config, Workbook srcBook, Workbook desBook) {
-        Sheet src = srcBook.getSheet(config.get("sheet"));
-        Sheet des = Sheets.getOrCreate(desBook, config.get("sheet"));
+    public Workbook work(Map<String, String> config, Workbook workbook) {
+        Sheet sheet = workbook.getSheet(config.get("sheet"));
         List<Row> failRowList = new ArrayList<>();
-        this.initialize(config, srcBook, desBook, src, des);
-        for (int i = 0; i < src.getLastRowNum(); i += 1) {
-            Row srcRow = src.getRow(i);
-            Row desRow = Rows.getOrCreate(des, i);
+        this.initialize(config, workbook, sheet);
+        for (int i = 0; i < sheet.getLastRowNum(); i += 1) {
+            Row row = sheet.getRow(i);
             try {
-                if (filter(config, srcRow, desRow)) {
-                    failRowList.add(srcRow);
-                    desRow.setRowStyle(getErrorStyle(desBook));
+                if (filter(config, row)) {
+                    failRowList.add(row);
+                    row.setRowStyle(getErrorStyle(workbook));
                     LOGGER.warn("行 " + i + " 被忽略");
                     continue;
                 }
-                if (!work(config, srcRow, desRow)) {
-                    failRowList.add(srcRow);
+                if (!work(config, row)) {
+                    failRowList.add(row);
                     LOGGER.warn("行 " + i + " 处理失败");
                 }
             } catch (Throwable e) {
                 LOGGER.error("行 " + i + " 发生异常: ", e);
-                failRowList.add(srcRow);
+                failRowList.add(row);
             }
         }
-        LOGGER.info("处理比率 " + (des.getLastRowNum() - failRowList.size()) + "/" + des.getLastRowNum());
-        return desBook;
+        LOGGER.info("处理比率 " + (sheet.getLastRowNum() - failRowList.size()) + "/" + sheet.getLastRowNum());
+        return workbook;
     }
 
     public static CellStyle getErrorStyle(Workbook workbook) {
@@ -59,30 +55,27 @@ public abstract class AbstractRowWork implements WorkStrategy {
     /**
      * 过滤行
      *
-     * @param src
+     * @param row
      * @return 如果为真则直接视为失败的行
      */
-    public abstract boolean filter(Map<String, String> config, Row src, Row des);
+    public abstract boolean filter(Map<String, String> config, Row row);
 
     /**
      * 执行操作
      *
      * @param config
-     * @param src
-     * @param des
+     * @param row
      * @return 如果是false则视为失败的行，会被写在结果最后面并附带原因
      * @throws Throwable 如果抛异常则视为失败的行，并打印异常
      */
-    public abstract boolean work(Map<String, String> config, Row src, Row des) throws Throwable;
+    public abstract boolean work(Map<String, String> config, Row row) throws Throwable;
 
     /**
      * 初始化
      *
      * @param config
-     * @param srcBook
-     * @param desBook
+     * @param workbook
      * @param src
-     * @param des
      */
-    public abstract void initialize(Map<String, String> config, Workbook srcBook, Workbook desBook, Sheet src, Sheet des);
+    public abstract void initialize(Map<String, String> config, Workbook workbook, Sheet src);
 }

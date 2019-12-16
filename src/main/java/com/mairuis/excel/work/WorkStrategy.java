@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * 处理策略
- *
+ * file -> memory -> file
  * @author Mairuis
  * @date 2019/12/8
  */
@@ -15,8 +15,7 @@ public interface WorkStrategy {
      * 执行
      *
      * @param config
-     * @param srcBook
-     * @param desBook
+     * @param workbook
      */
-    Workbook work(Map<String, String> config, Workbook srcBook, Workbook desBook);
+    Workbook work(Map<String, String> config, Workbook workbook);
 }

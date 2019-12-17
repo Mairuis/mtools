@@ -57,6 +57,7 @@ public class MergeSheetByHeader implements WorkbookTask {
         this.onInitialize(config, srcSheet, desSheet, desHeaderIndex, srcMapDesIndex);
 
         int desIndex = desSheet.getLastRowNum();
+        boolean firstRow = true;
         for (int index = CONTENT_START_NUMBER; index < srcSheet.getLastRowNum(); index += 1) {
             Row srcRow = srcSheet.getRow(index);
             Row desRow = Rows.getOrCreate(desSheet, desIndex);
@@ -67,12 +68,14 @@ public class MergeSheetByHeader implements WorkbookTask {
 
             for (int srcColumn = 0; srcColumn < srcRow.getLastCellNum(); srcColumn += 1) {
                 if (!srcMapDesIndex.containsKey(srcColumn)) {
-                    LOGGER.debug("表 {} 行 {} 列 {} 列头 {} 值 {} 未能找到映射目标",
-                            srcSheet.getSheetName(),
-                            index,
-                            srcColumn,
-                            srcHeaderRow.getCell(srcColumn) == null ? "空列(" + srcColumn + ")" : Cells.toString(srcHeaderRow.getCell(srcColumn)),
-                            srcRow.getCell(srcColumn));
+                    if (firstRow) {
+                        LOGGER.debug("表 {} 行 {} 列 {} 列头 {} 值 {} 未能找到映射目标",
+                                srcSheet.getSheetName(),
+                                index,
+                                srcColumn,
+                                srcHeaderRow.getCell(srcColumn) == null ? "空列(" + srcColumn + ")" : Cells.toString(srcHeaderRow.getCell(srcColumn)),
+                                srcRow.getCell(srcColumn));
+                    }
                     continue;
                 }
                 Cell srcCell = Cells.getOrCreate(srcRow, srcColumn);
@@ -85,6 +88,7 @@ public class MergeSheetByHeader implements WorkbookTask {
             LOGGER.debug(Rows.toString(srcRow));
             LOGGER.debug(Rows.toString(desRow));
             desIndex += 1;
+            firstRow = true;
             this.onRowMerge(config, srcSheet, desSheet, desHeaderIndex, srcMapDesIndex, srcRow, desRow);
         }
         return workbook;

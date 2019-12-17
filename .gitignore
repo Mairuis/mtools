@@ -30,4 +30,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### mtools
 /data/**
+/output/**

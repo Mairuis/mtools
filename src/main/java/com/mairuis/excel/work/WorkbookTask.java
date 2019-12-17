@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public interface WorkbookTask {
 
+    int HEADER_NUMBER = 3;
+    int CONTENT_START_NUMBER = 5;
     Logger LOGGER = LoggerFactory.getLogger(WorkbookTask.class);
 
     /**

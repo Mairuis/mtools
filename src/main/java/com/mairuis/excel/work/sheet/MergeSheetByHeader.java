@@ -1,13 +1,13 @@
 package com.mairuis.excel.work.sheet;
 
 import com.mairuis.excel.tools.utils.Cells;
+import com.mairuis.excel.tools.utils.Rows;
 import com.mairuis.excel.work.WorkbookTask;
 import com.mairuis.excel.work.Worker;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,9 +19,6 @@ import java.util.Map;
 @Worker
 public class MergeSheetByHeader implements WorkbookTask {
 
-    public static final int HEADER_NUMBER = 3;
-    public static final int CONTENT_START_NUMBER = 5;
-
     @Override
     public Workbook work(Map<String, String> config, Workbook workbook) {
         Sheet srcSheet = workbook.getSheet(config.get("source"));
@@ -32,13 +29,29 @@ public class MergeSheetByHeader implements WorkbookTask {
         Row desHeaderRow = desSheet.getRow(HEADER_NUMBER);
         for (int index = 0; index < desHeaderRow.getLastCellNum(); index += 1) {
             Cell cell = desHeaderRow.getCell(index);
-            desHeaderIndex.put(Cells.toString(cell), index);
+            if (cell == null) {
+                LOGGER.error("{} 表表头第 {} 列为空，自动忽略", desSheet.getSheetName(), index);
+                continue;
+            }
+            String value = Cells.toString(cell).trim();
+            if (value.length() > 0) {
+                desHeaderIndex.put(value, index);
+            }
         }
 
         Row srcHeaderRow = srcSheet.getRow(HEADER_NUMBER);
         for (int index = 0; index < desHeaderRow.getLastCellNum(); index += 1) {
             Cell cell = srcHeaderRow.getCell(index);
-            srcMapDesIndex.put(index, desHeaderIndex.get(Cells.toString(cell)));
+            if (cell == null) {
+                LOGGER.warn("{} 表表头第 {} 列为空，自动忽略", srcSheet.getSheetName(), index);
+                continue;
+            }
+            String value = Cells.toString(cell).trim();
+            if (!desHeaderIndex.containsKey(value)) {
+                LOGGER.warn("{} 表表头第 {} 列未找到映射表头，自动忽略", srcSheet.getSheetName(), index);
+                continue;
+            }
+            srcMapDesIndex.put(index, desHeaderIndex.get(value));
         }
 
         this.onInitialize(config, srcSheet, desSheet, desHeaderIndex, srcMapDesIndex);
@@ -46,23 +59,31 @@ public class MergeSheetByHeader implements WorkbookTask {
         int desIndex = desSheet.getLastRowNum();
         for (int index = CONTENT_START_NUMBER; index < srcSheet.getLastRowNum(); index += 1) {
             Row srcRow = srcSheet.getRow(index);
-            Row desRow = desSheet.getRow(desIndex);
+            Row desRow = Rows.getOrCreate(desSheet, desIndex);
+            if (srcRow == null) {
+                LOGGER.warn("跳过source表中的空行 {}", index);
+                continue;
+            }
+
             for (int srcColumn = 0; srcColumn < srcRow.getLastCellNum(); srcColumn += 1) {
                 if (!srcMapDesIndex.containsKey(srcColumn)) {
-                    LOGGER.warn("表 {} 行 {} 列 {} 列头 {} 值 {} 未能找到映射目标",
+                    LOGGER.debug("表 {} 行 {} 列 {} 列头 {} 值 {} 未能找到映射目标",
                             srcSheet.getSheetName(),
                             index,
                             srcColumn,
-                            Cells.toString(srcHeaderRow.getCell(srcColumn)),
+                            srcHeaderRow.getCell(srcColumn) == null ? "空列(" + srcColumn + ")" : Cells.toString(srcHeaderRow.getCell(srcColumn)),
                             srcRow.getCell(srcColumn));
                     continue;
                 }
-                Cell srcCell = srcRow.getCell(srcColumn);
-                Cell desCell = desRow.getCell(srcMapDesIndex.get(srcColumn));
+                Cell srcCell = Cells.getOrCreate(srcRow, srcColumn);
+                Cell desCell = Cells.getOrCreate(desRow, srcMapDesIndex.get(srcColumn));
 
                 Cells.copyCell(srcCell, desCell);
                 Cells.copyStyle(srcCell, desCell);
+
             }
+            LOGGER.debug(Rows.toString(srcRow));
+            LOGGER.debug(Rows.toString(desRow));
             desIndex += 1;
             this.onRowMerge(config, srcSheet, desSheet, desHeaderIndex, srcMapDesIndex, srcRow, desRow);
         }

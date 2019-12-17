@@ -1,5 +1,7 @@
 package com.mairuis.excel;
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
  * @since 2019/12/17
  */
 @Configuration
-@ComponentScan(value = "com.mairuis.excel.work")
 public class ExcelWorkerConfig {
-
 
 }

@@ -1,6 +1,8 @@
 package com.mairuis.excel.work;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -10,7 +12,10 @@ import java.util.Map;
  * @author Mairuis
  * @date 2019/12/8
  */
-public interface WorkStrategy {
+public interface WorkbookTask {
+
+    Logger LOGGER = LoggerFactory.getLogger(WorkbookTask.class);
+
     /**
      * 执行
      *

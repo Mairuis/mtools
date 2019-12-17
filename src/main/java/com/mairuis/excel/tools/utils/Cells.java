@@ -1,37 +1,47 @@
 package com.mairuis.excel.tools.utils;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Mairuis
  * @since 2019/12/9
  */
 public class Cells {
-    public static void copyCell(Cell src, Cell des) {
-        switch (src.getCellType()) {
-            case STRING:
-                des.setCellValue(src.getStringCellValue());
-                break;
-            case BOOLEAN:
-                des.setCellValue(src.getBooleanCellValue());
-                break;
-            case FORMULA:
-                des.setCellFormula(src.getCellFormula());
-                break;
-            case ERROR:
-                des.setCellErrorValue(src.getErrorCellValue());
-                break;
-            case NUMERIC:
-                des.setCellValue(src.getNumericCellValue());
-                break;
-            case BLANK:
-            case _NONE:
-                des.setBlank();
-                break;
-            default:
-                throw new IllegalStateException();
+
+    private static List<CellStyle> CACHE = new ArrayList<>();
+
+    public static void copyStyle(Cell src, Cell des) {
+        for (CellStyle style : CACHE) {
+            if (style.equals(src.getCellStyle())) {
+                des.setCellStyle(style);
+                return;
+            }
         }
+        CellStyle cellStyle = cloneStyle(src);
+        des.setCellStyle(cellStyle);
+        CACHE.add(cellStyle);
+    }
+
+    public static CellStyle cloneStyle(Cell cell) {
+        for (CellStyle style : CACHE) {
+            if (style.equals(cell.getCellStyle())) {
+                return style;
+            }
+        }
+        CellStyle cellStyle = cell.getSheet().getWorkbook().createCellStyle();
+        cellStyle.cloneStyleFrom(cell.getCellStyle());
+        CACHE.add(cellStyle);
+        return cellStyle;
+    }
+
+    public static void copyCell(Cell src, Cell des) {
+        writeCell(src, getValue(des));
     }
 
     public static void writeCell(Cell desCell, Object obj) {
@@ -60,18 +70,31 @@ public class Cells {
         }
     }
 
-    public static String getCellValue(Cell cell) {
-        switch (cell.getCellType()) {
+    public static String toString(Cell cell) {
+        return toString(cell, cell.getCellType());
+    }
+
+    public static String toString(Cell cell, CellType cellType) {
+        return getValue(cell, cellType).toString();
+    }
+
+    public static Object getValue(Cell cell) {
+        return getValue(cell, cell.getCellType());
+    }
+
+    public static Object getValue(Cell cell, CellType cellType) {
+        switch (cellType) {
             case STRING:
                 return cell.getStringCellValue();
             case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            case FORMULA:
-                return cell.getCellFormula();
+                return cell.getBooleanCellValue();
+            case FORMULA: {
+                return getValue(cell, cell.getCachedFormulaResultType());
+            }
             case ERROR:
-                return String.valueOf(cell.getErrorCellValue());
+                return cell.getErrorCellValue();
             case NUMERIC:
-                return String.valueOf(cell.getNumericCellValue());
+                return cell.getNumericCellValue();
             case BLANK:
             case _NONE:
                 return "NONE";

@@ -22,6 +22,7 @@ public final class Rows {
         for (Cell cell : src) {
             Cell desCell = Cells.getOrCreate(des, start);
             Cells.copyCell(cell, desCell);
+            Cells.copyStyle(cell, desCell);
             start += 1;
         }
     }
@@ -77,7 +78,7 @@ public final class Rows {
         }
         String[] cells = new String[src.getLastCellNum() - startIndex];
         for (int j = 0; startIndex < count && startIndex < src.getLastCellNum(); startIndex += 1, j += 1) {
-            cells[j] = Cells.getCellValue(src.getCell(startIndex));
+            cells[j] = Cells.toString(src.getCell(startIndex));
         }
         return cells;
     }
@@ -91,12 +92,12 @@ public final class Rows {
     }
 
     public static String toString(Row row) {
-        String dump = "";
+        String dump = row.getRowNum() + " : ";
         for (Cell cell : row) {
             if (cell != null) {
-                dump = cell.toString() + "\t";
+                dump +=  cell.toString() + "\t | ";
             } else {
-                dump = "null\t";
+                dump += "null\t | ";
             }
         }
         return dump;

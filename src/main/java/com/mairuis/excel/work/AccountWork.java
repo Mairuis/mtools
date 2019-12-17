@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Mairuis
  * @date 2019/12/17
  */
-public class AccountWork implements WorkStrategy {
+public class AccountWork implements WorkbookTask {
 
     @Override
     public Workbook work(Map<String, String> config, Workbook workbook) {

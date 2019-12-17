@@ -14,13 +14,16 @@ import java.util.Map;
  * @author Mairuis
  * @since 2019/12/9
  */
-public abstract class AbstractRowWork implements WorkStrategy {
+public abstract class AbstractRowWork implements WorkbookTask {
 
     private static Logger LOGGER = LoggerFactory.getLogger(AbstractRowWork.class);
 
     @Override
     public Workbook work(Map<String, String> config, Workbook workbook) {
         Sheet sheet = workbook.getSheet(config.get("sheet"));
+        if (sheet == null) {
+            throw new NullPointerException("Sheet" + config.get("sheet") + "不存在");
+        }
         List<Row> failRowList = new ArrayList<>();
         this.initialize(config, workbook, sheet);
         for (int i = 0; i < sheet.getLastRowNum(); i += 1) {
@@ -32,7 +35,7 @@ public abstract class AbstractRowWork implements WorkStrategy {
                     LOGGER.warn("行 " + i + " 被忽略");
                     continue;
                 }
-                if (!work(config, row)) {
+                if (!work(config, workbook, sheet, row)) {
                     failRowList.add(row);
                     LOGGER.warn("行 " + i + " 处理失败");
                 }
@@ -68,7 +71,7 @@ public abstract class AbstractRowWork implements WorkStrategy {
      * @return 如果是false则视为失败的行，会被写在结果最后面并附带原因
      * @throws Throwable 如果抛异常则视为失败的行，并打印异常
      */
-    public abstract boolean work(Map<String, String> config, Row row) throws Throwable;
+    public abstract boolean work(Map<String, String> config, Workbook workbook, Sheet sheet, Row row) throws Throwable;
 
     /**
      * 初始化

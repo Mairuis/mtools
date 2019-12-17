@@ -1,20 +1,25 @@
-package com.mairuis.excel.work;
+package com.mairuis.excel.work.row;
 
 import com.mairuis.excel.tools.utils.Rows;
+import com.mairuis.excel.work.AbstractRowWork;
+import com.mairuis.excel.work.Worker;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 /**
- * 基本户分割
+ *
  *
  * @author Mairuis
  * @date 2019/12/8
  */
-public class BaseClientSpiltWork extends AbstractRowWork {
+@Worker
+public class AccountSpilt extends AbstractRowWork {
 
     private boolean isDate(String value) {
         return value.contains("月") && value.contains("日");
@@ -32,7 +37,7 @@ public class BaseClientSpiltWork extends AbstractRowWork {
     }
 
     @Override
-    public boolean work(Map<String, String> config, Row row) {
+    public boolean work(Map<String, String> config, Workbook workbook, Sheet sheet, Row row) {
         String value = row.getCell(2).getStringCellValue().replace(" ", "");
         String[] values = value.split("-");
         Cell[] leftCells = new Cell[]{row.getCell(0), row.getCell(1), row.getCell(2)};

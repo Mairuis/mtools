@@ -1,5 +1,6 @@
 package com.mairuis.excel.work.row;
 
+import com.alibaba.fastjson.JSON;
 import com.mairuis.excel.tools.utils.Rows;
 import com.mairuis.excel.work.AbstractRowWork;
 import com.mairuis.excel.work.Worker;
@@ -15,7 +16,7 @@ import java.util.Map;
  * @date 2019/12/8
  */
 @Worker
-public class AccountSpilt extends AbstractRowWork {
+public class AccountSplit extends AbstractRowWork {
 
     private boolean isDate(String value) {
         return value.contains("月") && value.contains("日");
@@ -23,6 +24,9 @@ public class AccountSpilt extends AbstractRowWork {
 
     @Override
     public boolean filter(Map<String, String> config, Row row) {
+        if (row.getCell(2) == null) {
+            return true;
+        }
         String value = row.getCell(2).getStringCellValue();
         return value.contains("食堂") ||
                 (!value.contains("结算款")
@@ -54,6 +58,7 @@ public class AccountSpilt extends AbstractRowWork {
                     return true;
                 }
             }
+
         } else if (value.contains("订餐款")) {
 
         } else if (value.contains("预付款")) {
@@ -68,6 +73,14 @@ public class AccountSpilt extends AbstractRowWork {
 
     @Override
     public void initialize(Map<String, String> config, Workbook workbook, Sheet src) {
-
+        Row headerRow = src.getRow(HEADER_NUMBER);
+        Map<String, Integer> header = Rows.getHeaderMap(headerRow);
+        String[] defaultHeader = JSON.parseObject("[\"事项\",\"会计科目\",\"现金流\",\"城市\",\"客户\",\"客户编码\",\"供应商\",\"供应商编码\",\"周期一\",\"周期二\"]", String[].class);
+        for (String dh : defaultHeader) {
+            if (!header.containsKey(dh)) {
+                Cell cell = Rows.appendLast(headerRow, dh);
+                LOGGER.warn("未找到表头 {} 自动补充至列 {}", dh, cell.getColumnIndex());
+            }
+        }
     }
 }

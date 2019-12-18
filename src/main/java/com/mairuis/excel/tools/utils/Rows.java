@@ -4,10 +4,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * POI该有却没有的API弥补
@@ -92,12 +89,12 @@ public final class Rows {
     }
 
     public static String toString(Row row) {
-        String dump = row.getRowNum() + " : ";
+        String dump = row.getRowNum() + ":|";
         for (Cell cell : row) {
             if (cell != null) {
-                dump += cell.toString() + "\t | ";
+                dump += cell.toString() + "|";
             } else {
-                dump += "null\t | ";
+                dump += "null|";
             }
         }
         return dump;
@@ -105,5 +102,42 @@ public final class Rows {
 
     public static void copyStyle(Row srcRow, Row desRow) {
         desRow.setRowStyle(srcRow.getRowStyle());
+    }
+
+    public static Map<String, Integer> getHeaderMap(Row row) {
+        Map<String, Integer> headerMap = new HashMap<>();
+        for (int index = 0; index < row.getLastCellNum(); index += 1) {
+            Cell cell = row.getCell(index);
+            if (cell == null) {
+                continue;
+            }
+            String value = Cells.toString(cell).trim();
+            if (value.length() > 0) {
+                headerMap.put(value, index);
+            }
+        }
+        return headerMap;
+    }
+
+    public static int getLastCell(Row row) {
+        int index = row.getLastCellNum() + 1;
+        for (int i = row.getLastCellNum() + 1; i >= 0; i -= 1) {
+            Cell cell = row.getCell(i);
+            if (!Cells.isEmpty(cell)) {
+                index = i + 1;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public static Cell append(Row row, Object value) {
+        return Cells.getOrCreate(row, appendLast(row, value).getColumnIndex());
+    }
+
+    public static Cell appendLast(Row row, Object value) {
+        Cell lastCell = Cells.getOrCreate(row, getLastCell(row));
+        Cells.writeCell(lastCell, value);
+        return lastCell;
     }
 }

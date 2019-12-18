@@ -45,6 +45,9 @@ public class Cells {
     }
 
     public static String toString(Cell cell) {
+        if (cell == null) {
+            return "null";
+        }
         return toString(cell, cell.getCellType());
     }
 
@@ -53,10 +56,16 @@ public class Cells {
     }
 
     public static Object getValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
         return getValue(cell, cell.getCellType());
     }
 
     public static Object getValue(Cell cell, CellType cellType) {
+        if (cell == null) {
+            return null;
+        }
         switch (cellType) {
             case STRING:
                 return String.valueOf(cell.getStringCellValue());
@@ -83,6 +92,26 @@ public class Cells {
             cell = row.createCell(index);
         }
         return cell;
+    }
+
+    public static int getColumn(Row row, String value) {
+        for (Cell cell : row) {
+            if (cell == null) {
+                continue;
+            }
+            if (value.equals(getValue(cell))) {
+                return cell.getColumnIndex();
+            }
+        }
+        return -1;
+    }
+
+    public static boolean isEmpty(Cell cell) {
+        if (cell == null) {
+            return true;
+        }
+        Object value = getValue(cell);
+        return value == null || (value instanceof String && "".equals(((String) value).trim()));
     }
 
 }

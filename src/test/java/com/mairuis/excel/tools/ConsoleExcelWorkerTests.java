@@ -16,20 +16,24 @@ public class ConsoleExcelWorkerTests {
     @Test
     public void testMergeAccount() {
         SpringApplication.run(ConsoleExcelWorker.class,
-                "outFilePath=output/testMergeAccount",
-                "filePath=data/testMerge.xlsx",
+                "outFilePath=output/MergedAccount",
+                "filePath=data/（美餐巧达）日记账.xlsx",
                 "task=MergeAccount",
-                "source=源",
-                "destination=目标",
+                "source=招行（美餐巧达）",
+                "destination=基本户",
                 "destinationBank=渣打",
-                "destinationStartRow=3666",
+                "destinationStartRow=3564",
                 "sourceBank=招商"
         );
     }
 
     @Test
     public void testSplit() {
-        SpringApplication.run(ConsoleExcelWorker.class, "outFilePath=output/split", "filePath=data/Workbook.xls", "task=AccountSplit", "sheet=Test");
+        SpringApplication.run(ConsoleExcelWorker.class,
+                "outFilePath=output/SplitAccount.xlsx",
+                "filePath=output/MergedAccount.xlsx",
+                "task=AccountSplit",
+                "sheet=基本户");
     }
 
 }

@@ -43,39 +43,35 @@ public class MergeSheetByHeader implements WorkbookTask {
         for (int index = 0; index < desHeaderRow.getLastCellNum(); index += 1) {
             Cell cell = srcHeaderRow.getCell(index);
             if (cell == null) {
-                LOGGER.warn("{} 表表头第 {} 列为空，自动忽略", srcSheet.getSheetName(), index);
+                LOGGER.warn("{} 表第 {} 列为空，被抛弃", srcSheet.getSheetName(), index);
                 continue;
             }
             String value = Cells.toString(cell).trim();
             if (!desHeaderIndex.containsKey(value)) {
-                LOGGER.warn("{} 表表头第 {} 列 {} 未找到映射表头，自动忽略", srcSheet.getSheetName(), index, value);
+                LOGGER.warn("{} 第 {} 列 {} 被抛弃", srcSheet.getSheetName(), index, value);
                 continue;
             }
+            LOGGER.info("{} -> {} 列映射 {}:{} -> {}:{}", srcSheet.getSheetName(), desSheet.getSheetName(), index, value, desHeaderIndex.get(value), value);
             srcMapDesIndex.put(index, desHeaderIndex.get(value));
         }
 
         this.onInitialize(config, srcSheet, desSheet, desHeaderIndex, srcMapDesIndex);
 
         int desIndex = Integer.parseInt(config.getOrDefault("destinationStartRow", String.valueOf(desSheet.getLastRowNum() + 1)));
-        boolean firstRow = true;
+        if (desSheet.getRow(desIndex) != null) {
+            String value = Rows.toString(desSheet.getRow(desIndex));
+            LOGGER.warn("{} 表内内容起始行 {}", srcSheet.getSheetName(), value);
+        }
         for (int index = CONTENT_START_NUMBER; index <= srcSheet.getLastRowNum(); index += 1) {
             Row srcRow = srcSheet.getRow(index);
             Row desRow = Rows.getOrCreate(desSheet, desIndex);
             if (srcRow == null) {
-                LOGGER.warn("在表 {} 遇到空行，执行完成 {}", srcSheet.getSheetName(), index);
+                LOGGER.warn("在表 {} 遇到空行，判断为结束行，程序执行完成 {}", srcSheet.getSheetName(), index);
                 break;
             }
 
             for (int srcColumn = 0; srcColumn < srcRow.getLastCellNum(); srcColumn += 1) {
                 if (!srcMapDesIndex.containsKey(srcColumn)) {
-                    if (firstRow) {
-                        LOGGER.debug("表 {} 行 {} 列 {} 列头 {} 值 {} 未能找到映射目标",
-                                srcSheet.getSheetName(),
-                                index,
-                                srcColumn,
-                                srcHeaderRow.getCell(srcColumn) == null ? "空列(" + srcColumn + ")" : Cells.toString(srcHeaderRow.getCell(srcColumn)),
-                                srcRow.getCell(srcColumn));
-                    }
                     continue;
                 }
                 Cell srcCell = Cells.getOrCreate(srcRow, srcColumn);
@@ -83,11 +79,9 @@ public class MergeSheetByHeader implements WorkbookTask {
 
                 Cells.copyCell(srcCell, desCell);
                 Cells.copyStyle(srcCell, desCell);
-
             }
             Rows.copyStyle(srcRow, desRow);
             desIndex += 1;
-            firstRow = true;
             this.onRowMerge(config, srcSheet, desSheet, desHeaderIndex, srcMapDesIndex, srcRow, desRow);
         }
         return workbook;

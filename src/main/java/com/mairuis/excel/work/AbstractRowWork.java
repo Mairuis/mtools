@@ -1,8 +1,6 @@
 package com.mairuis.excel.work;
 
 import org.apache.poi.ss.usermodel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +13,6 @@ import java.util.Map;
  * @since 2019/12/9
  */
 public abstract class AbstractRowWork implements WorkbookTask {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(AbstractRowWork.class);
 
     public static CellStyle getErrorStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -35,6 +31,9 @@ public abstract class AbstractRowWork implements WorkbookTask {
         this.initialize(config, workbook, sheet);
         for (int i = 0; i < sheet.getLastRowNum(); i += 1) {
             Row row = sheet.getRow(i);
+            if (row == null) {
+                continue;
+            }
             try {
                 if (filter(config, row)) {
                     failRowList.add(row);

@@ -4,6 +4,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,6 +19,8 @@ import java.util.Optional;
  * @since 2019/12/9
  */
 public class Workbooks {
+    static Logger LOGGER = LoggerFactory.getLogger(Workbooks.class);
+
     public static void writeToFile(Workbook workbook, String fileName) {
         String suffix = ".error";
         if (workbook instanceof HSSFWorkbook) {
@@ -29,6 +33,15 @@ public class Workbooks {
     }
 
     public static void writeToFile(Workbook workbook, File file) {
+        if (!file.exists()) {
+            try {
+                if (file.createNewFile()) {
+                    LOGGER.warn("文件 {} 不存在，自动创建", file.getName());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
             workbook.write(fileOutputStream);
         } catch (IOException e) {

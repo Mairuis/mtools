@@ -17,9 +17,13 @@ public class MergeAccount extends MergeSheetByHeader {
 
     @Override
     protected void onInitialize(Map<String, String> config, Sheet srcSheet, Sheet desSheet, Map<String, Integer> desHeaderIndex, Map<Integer, Integer> srcMapDesIndex) {
-        if (config.containsKey("destinationBank") && desHeaderIndex.containsKey(config.getOrDefault("bankHeader", "银行"))) {
+        if (config.containsKey("destinationBank")
+                && desHeaderIndex.containsKey(config.getOrDefault("bankHeader", "银行"))) {
             int headerIndex = desHeaderIndex.get(config.getOrDefault("bankHeader", "银行"));
             for (Row row : desSheet) {
+                if (row.getRowNum() < CONTENT_START_NUMBER) {
+                    continue;
+                }
                 Cell cell = Cells.getOrCreate(row, headerIndex);
                 cell.setCellValue(config.get("destinationBank"));
             }

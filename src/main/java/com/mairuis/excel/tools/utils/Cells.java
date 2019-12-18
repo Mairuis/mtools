@@ -1,12 +1,8 @@
 package com.mairuis.excel.tools.utils;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Mairuis
@@ -14,34 +10,12 @@ import java.util.List;
  */
 public class Cells {
 
-    private static List<CellStyle> CACHE = new ArrayList<>();
-
     public static void copyStyle(Cell src, Cell des) {
-        for (CellStyle style : CACHE) {
-            if (style.equals(src.getCellStyle())) {
-                des.setCellStyle(style);
-                return;
-            }
-        }
-        CellStyle cellStyle = cloneStyle(src);
-        des.setCellStyle(cellStyle);
-        CACHE.add(cellStyle);
-    }
-
-    public static CellStyle cloneStyle(Cell cell) {
-        for (CellStyle style : CACHE) {
-            if (style.equals(cell.getCellStyle())) {
-                return style;
-            }
-        }
-        CellStyle cellStyle = cell.getSheet().getWorkbook().createCellStyle();
-        cellStyle.cloneStyleFrom(cell.getCellStyle());
-        CACHE.add(cellStyle);
-        return cellStyle;
+        des.setCellStyle(src.getCellStyle());
     }
 
     public static void copyCell(Cell src, Cell des) {
-        writeCell(src, getValue(des));
+        writeCell(des, getValue(src));
     }
 
     public static void writeCell(Cell desCell, Object obj) {
@@ -85,19 +59,19 @@ public class Cells {
     public static Object getValue(Cell cell, CellType cellType) {
         switch (cellType) {
             case STRING:
-                return cell.getStringCellValue();
+                return String.valueOf(cell.getStringCellValue());
             case BOOLEAN:
-                return cell.getBooleanCellValue();
+                return Boolean.valueOf(cell.getBooleanCellValue());
             case FORMULA: {
                 return getValue(cell, cell.getCachedFormulaResultType());
             }
             case ERROR:
                 return cell.getErrorCellValue();
             case NUMERIC:
-                return cell.getNumericCellValue();
+                return Double.valueOf(cell.getNumericCellValue());
             case BLANK:
             case _NONE:
-                return "NONE";
+                return "";
             default:
                 throw new IllegalStateException();
         }

@@ -102,4 +102,8 @@ public final class Rows {
         }
         return dump;
     }
+
+    public static void copyStyle(Row srcRow, Row desRow) {
+        desRow.setRowStyle(srcRow.getRowStyle());
+    }
 }

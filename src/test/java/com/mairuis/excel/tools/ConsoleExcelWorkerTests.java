@@ -17,11 +17,12 @@ public class ConsoleExcelWorkerTests {
     public void testMergeAccount() {
         SpringApplication.run(ConsoleExcelWorker.class,
                 "outFilePath=output/testMergeAccount",
-                "filePath=data/（美餐巧达）日记账2019年12月.xlsx",
+                "filePath=data/testMerge.xlsx",
                 "task=MergeAccount",
-                "source=招行（美餐巧达）",
-                "destination=基本户",
+                "source=源",
+                "destination=目标",
                 "destinationBank=渣打",
+                "destinationStartRow=3666",
                 "sourceBank=招商"
         );
     }

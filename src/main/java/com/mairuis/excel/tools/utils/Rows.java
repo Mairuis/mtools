@@ -95,7 +95,7 @@ public final class Rows {
         String dump = row.getRowNum() + " : ";
         for (Cell cell : row) {
             if (cell != null) {
-                dump +=  cell.toString() + "\t | ";
+                dump += cell.toString() + "\t | ";
             } else {
                 dump += "null\t | ";
             }

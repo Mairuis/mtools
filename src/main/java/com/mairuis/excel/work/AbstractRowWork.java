@@ -18,6 +18,13 @@ public abstract class AbstractRowWork implements WorkbookTask {
 
     private static Logger LOGGER = LoggerFactory.getLogger(AbstractRowWork.class);
 
+    public static CellStyle getErrorStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.RED.getIndex());
+        style.setFillPattern(FillPatternType.BIG_SPOTS);
+        return style;
+    }
+
     @Override
     public Workbook work(Map<String, String> config, Workbook workbook) {
         Sheet sheet = workbook.getSheet(config.get("sheet"));
@@ -46,13 +53,6 @@ public abstract class AbstractRowWork implements WorkbookTask {
         }
         LOGGER.info("处理比率 " + (sheet.getLastRowNum() - failRowList.size()) + "/" + sheet.getLastRowNum());
         return workbook;
-    }
-
-    public static CellStyle getErrorStyle(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setFillForegroundColor(IndexedColors.RED.getIndex());
-        style.setFillPattern(FillPatternType.BIG_SPOTS);
-        return style;
     }
 
     /**

@@ -5,7 +5,6 @@ import com.mairuis.excel.work.Worker;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 

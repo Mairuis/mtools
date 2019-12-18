@@ -32,18 +32,6 @@ public class ExcelCodec implements ICellCodec<Row, Object[]> {
 
     private SheetCodec currentSheetCodec;
 
-    protected static class SheetCodec {
-        //为实现Iterator预留
-        private int readPos = 0, writePos = 0;
-        private int readMark = -1, writeMark = -1;
-
-        private Sheet sheet;
-
-        public SheetCodec(Sheet sheet) {
-            this.sheet = sheet;
-        }
-    }
-
     /**
      * 旧表Copy到新表模式
      *
@@ -161,6 +149,18 @@ public class ExcelCodec implements ICellCodec<Row, Object[]> {
             this.workbook.write(outputStream);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    protected static class SheetCodec {
+        //为实现Iterator预留
+        private int readPos = 0, writePos = 0;
+        private int readMark = -1, writeMark = -1;
+
+        private Sheet sheet;
+
+        public SheetCodec(Sheet sheet) {
+            this.sheet = sheet;
         }
     }
 }

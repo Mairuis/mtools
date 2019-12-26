@@ -66,7 +66,7 @@ public class MergeSheetByHeader implements WorkbookTask {
             Row srcRow = srcSheet.getRow(index);
             Row desRow = Rows.getOrCreate(desSheet, desIndex);
             if (srcRow == null) {
-                LOGGER.warn("在表 {} 遇到空行，判断为结束行，程序执行完成 {}", srcSheet.getSheetName(), index);
+                LOGGER.warn("在表 {} 第 {} 行遇到空行 ，判断为结束行，程序执行完成", srcSheet.getSheetName(), index);
                 break;
             }
 

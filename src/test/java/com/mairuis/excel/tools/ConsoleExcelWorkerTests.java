@@ -30,7 +30,7 @@ public class ConsoleExcelWorkerTests {
     @Test
     public void testSplit() {
         SpringApplication.run(ConsoleExcelWorker.class,
-                "outFilePath=output/SplitAccount.xlsx",
+                "outFilePath=output/SplitAccount",
                 "filePath=output/MergedAccount.xlsx",
                 "task=AccountSplit",
                 "sheet=基本户");

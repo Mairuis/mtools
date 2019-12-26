@@ -104,7 +104,7 @@ public final class Rows {
         desRow.setRowStyle(srcRow.getRowStyle());
     }
 
-    public static Map<String, Integer> getHeaderMap(Row row) {
+    public static Map<String, Integer> getIndexMap(Row row) {
         Map<String, Integer> headerMap = new HashMap<>();
         for (int index = 0; index < row.getLastCellNum(); index += 1) {
             Cell cell = row.getCell(index);
@@ -139,5 +139,27 @@ public final class Rows {
         Cell lastCell = Cells.getOrCreate(row, getLastCell(row));
         Cells.writeCell(lastCell, value);
         return lastCell;
+    }
+
+    public static boolean isEmptyRow(Row row) {
+        for (Cell cell : row) {
+            if (!Cells.isEmpty(cell)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static int ensureColumn(int rowNumber, Sheet sheet, Iterable<String> iterable) {
+        int count = 0;
+        Row row = Rows.getOrCreate(sheet, rowNumber);
+        Map<String, Integer> map = Rows.getIndexMap(row);
+        for (String header : iterable) {
+            if (!map.containsKey(header)) {
+                Rows.appendLast(row, header);
+                count += 1;
+            }
+        }
+        return count;
     }
 }

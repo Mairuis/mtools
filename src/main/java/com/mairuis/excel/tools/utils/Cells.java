@@ -18,6 +18,10 @@ public class Cells {
         writeCell(des, getValue(src));
     }
 
+    public static void writeCell(Row row, int column, Object obj) {
+        writeCell(Cells.getOrCreate(row, column), obj);
+    }
+
     public static void writeCell(Cell desCell, Object obj) {
         if (obj == null) {
             desCell.setBlank();

@@ -19,14 +19,14 @@ public class AccountTree extends Account {
     public boolean check() {
         if (getLoan() > 0) {
             if (getChildrenLoan() - getChildrenBorrow() != getLoan()) {
-                throw new IllegalStateException("贷方值错误" + getRowNumber());
+                throw new IllegalStateException("贷方值错误" + getRow().getRowNum());
             }
         } else if (getBorrow() > 0) {
             if (getChildrenBorrow() - getChildrenLoan() != getBorrow()) {
-                throw new IllegalStateException("借方值错误" + getRowNumber());
+                throw new IllegalStateException("借方值错误" + getRow().getRowNum());
             }
         } else {
-            throw new IllegalStateException("借方值错误" + getRowNumber());
+            throw new IllegalStateException("借方值错误" + getRow().getRowNum());
         }
         return true;
     }

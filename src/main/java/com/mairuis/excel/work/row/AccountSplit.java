@@ -22,20 +22,16 @@ import static com.mairuis.excel.entity.AccountType.结算款;
 @Worker
 public class AccountSplit extends AbstractRowWork {
     public AccountSplit() {
-        super(new ArrayList<String>() {
-            {
-                this.add("事项");
-                this.add("会计科目");
-                this.add("现金流");
-                this.add("城市");
-                this.add("客户");
-                this.add("客户编码");
-                this.add("供应商");
-                this.add("供应商编码");
-                this.add("周期一");
-                this.add("周期二");
-            }
-        });
+        this.addHeader("事项");
+        this.addHeader("会计科目");
+        this.addHeader("现金流");
+        this.addHeader("城市");
+        this.addHeader("客户");
+        this.addHeader("客户编码");
+        this.addHeader("供应商");
+        this.addHeader("供应商编码");
+        this.addHeader("周期一");
+        this.addHeader("周期二");
     }
 
     private boolean isDate(String value) {

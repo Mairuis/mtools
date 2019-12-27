@@ -2,12 +2,11 @@ package com.mairuis.excel.work;
 
 import com.mairuis.excel.tools.utils.Cells;
 import com.mairuis.excel.tools.utils.Rows;
+import com.mairuis.excel.work.sheet.HeaderSheetWork;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,55 +15,48 @@ import java.util.Map;
  * @author Mairuis
  * @since 2019/12/9
  */
-public abstract class AbstractRowWork implements WorkbookTask {
-    private List<String> defaultHeader;
+public abstract class AbstractRowWork extends HeaderSheetWork {
 
     public AbstractRowWork() {
-    }
-
-    public AbstractRowWork(List<String> defaultHeader) {
-        this.defaultHeader = defaultHeader;
-        this.defaultHeader.add("处理结果");
+        this.addHeader("处理结果");
     }
 
     @Override
-    public Workbook work(Map<String, String> config, Workbook workbook) {
-        Sheet sheet = workbook.getSheet(config.get("sheet"));
-        if (sheet == null) {
-            throw new NullPointerException("Sheet" + config.get("sheet") + "不存在");
-        }
-        Rows.ensureColumn(HEADER_NUMBER, sheet, defaultHeader);
-        this.initialize(config, workbook, sheet);
-        List<Row> failRowList = new ArrayList<>();
+    public Workbook headerSheetWork(Map<String, String> config, Workbook workbook, Sheet sheet) {
         Map<String, Integer> headerMap = Rows.getIndexMap(sheet.getRow(HEADER_NUMBER));
+        int rowCount = 0, successCount = 0, failCount = 0, exceptionCount = 0, ignoreCount = 0;
         for (int i = CONTENT_START_NUMBER; i < sheet.getLastRowNum(); i += 1) {
             Row row = sheet.getRow(i);
             if (row == null) {
                 LOGGER.warn("在 {} 表遇到空行 {} 程序结束", sheet.getSheetName(), i);
                 break;
+            } else {
+                rowCount += 1;
             }
             String result = "未知";
             try {
                 if (filter(config, row)) {
-                    failRowList.add(row);
                     result = "忽略";
+                    ignoreCount += 1;
                     LOGGER.warn("行 " + i + " 被忽略");
                     continue;
                 }
                 if (!work(config, workbook, sheet, row)) {
-                    failRowList.add(row);
                     result = "失败";
+                    failCount += 1;
                     LOGGER.warn("行 " + i + " 处理失败");
                 }
                 result = "成功";
+                successCount += 1;
             } catch (Throwable e) {
+                result = "异常";
                 LOGGER.error("行 " + i + " 发生异常: ", e);
-                failRowList.add(row);
+                exceptionCount += 1;
             } finally {
                 Cells.writeCell(Cells.getOrCreate(row, headerMap.get("处理结果")), result);
             }
         }
-        LOGGER.info("处理比率 " + (sheet.getLastRowNum() - failRowList.size()) + "/" + sheet.getLastRowNum());
+        LOGGER.info("成功处理 {}/{} 失败 {} 异常 {} 忽略 {}", successCount, rowCount, failCount, exceptionCount, ignoreCount);
         return workbook;
     }
 
@@ -85,13 +77,4 @@ public abstract class AbstractRowWork implements WorkbookTask {
      * @throws Throwable 如果抛异常则视为失败的行，并打印异常
      */
     public abstract boolean work(Map<String, String> config, Workbook workbook, Sheet sheet, Row row) throws Throwable;
-
-    /**
-     * 初始化
-     *
-     * @param config
-     * @param workbook
-     * @param src
-     */
-    public abstract void initialize(Map<String, String> config, Workbook workbook, Sheet src);
 }

@@ -36,4 +36,12 @@ public class ConsoleExcelWorkerTests {
                 "sheet=基本户");
     }
 
+    @Test
+    public void testAccountCheck() {
+        SpringApplication.run(ConsoleExcelWorker.class,
+                "outFilePath=output/AccountCheck",
+                "filePath=output/SplitAccount.xlsx",
+                "task=AccountCheck",
+                "sheet=基本户");
+    }
 }

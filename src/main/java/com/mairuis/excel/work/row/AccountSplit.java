@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.mairuis.excel.entity.AccountType.结算款;
+import static com.mairuis.excel.entity.AccountType.订餐款;
 
 /**
  * @author Mairuis
@@ -47,12 +48,11 @@ public class AccountSplit extends AbstractRowWork {
             return true;
         }
         String value = row.getCell(2).getStringCellValue();
-        return value.contains("企业订餐-食堂") ||
-                (!value.contains("结算款")
+        return !value.contains("结算款")
                         && !value.contains("订餐款")
                         && !value.contains("预付款")
                         && !value.contains("押金")
-                        && !value.contains("回款"));
+                        && !value.contains("回款");
     }
 
     @Override
@@ -65,19 +65,19 @@ public class AccountSplit extends AbstractRowWork {
         AccountType accountType = AccountType.getType(value);
         switch (accountType) {
             case 结算款: {
-                if (values.length >= 7) {
+                if (values.length == 7 && value.contains("食堂")) {
                     //企业订餐-广州-食堂-河池职教中心（午餐）-南宁市民中心-11月27日-11月29日结算款
                     values[6] = values[6].replace(结算款.getName(), "");
                     if (isDate(values[6]) && isDate(values[5])) {
                         Cells.writeCell(row, header.get("城市"), values[1]);
-                        Cells.writeCell(row, header.get("周期一"), values[4]);
-                        Cells.writeCell(row, header.get("周期二"), values[5]);
-                        Cells.writeCell(row, header.get("供应商"), values[3]);
+                        Cells.writeCell(row, header.get("周期一"), values[5]);
+                        Cells.writeCell(row, header.get("周期二"), values[6]);
+                        Cells.writeCell(row, header.get("供应商"), values[4]);
                         Cells.writeCell(row, header.get("事项"), accountType.getName());
-                        Cells.writeCell(row, header.get("客户"), values[2]);
+                        Cells.writeCell(row, header.get("客户"), values[3]);
                         return true;
                     }
-                } else if (values.length >= 6) {
+                } else if (values.length == 6) {
                     //企业订餐-北京-贝壳到店-米feel餐厅-03月01日-03月31日结算款
                     values[5] = values[5].replace(结算款.getName(), "");
                     if (isDate(values[4]) && isDate(values[5])) {
@@ -103,6 +103,20 @@ public class AccountSplit extends AbstractRowWork {
                 }
                 break;
             }
+            case 订餐款:
+                if (values.length == 5) {
+                    //企业订餐-上海-斑马网络-08月01日-10月31日订餐款
+                    values[4] = values[4].replace(订餐款.getName(), "");
+                    if (isDate(values[3]) && isDate(values[4])) {
+                        Cells.writeCell(row, header.get("城市"), values[1]);
+                        Cells.writeCell(row, header.get("周期一"), values[3]);
+                        Cells.writeCell(row, header.get("周期二"), values[4]);
+                        Cells.writeCell(row, header.get("事项"), accountType.getName());
+                        Cells.writeCell(row, header.get("客户"), values[2]);
+                        return true;
+                    }
+                }
+                break;
             default:
                 LOGGER.warn("未处理 {}", accountType);
                 break;

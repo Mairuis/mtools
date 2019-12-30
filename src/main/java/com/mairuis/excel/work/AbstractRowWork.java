@@ -45,6 +45,7 @@ public abstract class AbstractRowWork extends HeaderSheetWork {
                     result = "失败";
                     failCount += 1;
                     LOGGER.warn("行 " + i + " 处理失败");
+                    continue;
                 }
                 result = "成功";
                 successCount += 1;

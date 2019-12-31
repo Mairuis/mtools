@@ -13,29 +13,9 @@ import org.apache.poi.ss.usermodel.Row;
 @Data
 @Accessors(chain = true)
 public class Account {
-    //月
-    private int month;
-    // 日
-    private int day;
-    // 摘要
-    private String note;
-    // 对方账户
-    private String targetAccount;
+    private int row;
     // 借方(收入)
     private int loan;
     // 贷方(支出)
     private int borrow;
-    // 标识
-    private String sign;
-    // 余额
-    // 区域/部门
-    // 开票
-    // 项目
-    // 修改
-    // 一级部门
-    // 二级部门
-    // 回单编号
-    private Row row;
-
-    private AccountType type;
 }

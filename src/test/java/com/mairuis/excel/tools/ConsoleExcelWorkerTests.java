@@ -30,18 +30,18 @@ public class ConsoleExcelWorkerTests {
     @Test
     public void testSplit() {
         SpringApplication.run(ConsoleExcelWorker.class,
-                "outFilePath=output/SplitAccount",
-                "filePath=output/MergedAccount.xlsx",
+                "outFilePath=output/（美餐巧达）日记账2019年12月",
+                "filePath=data/（美餐巧达）日记账2019年12月.xlsx",
                 "task=AccountSplit",
-                "sheet=基本户");
+                "sheet=基本户&招行-业务端");
     }
 
     @Test
     public void testAccountCheck() {
         SpringApplication.run(ConsoleExcelWorker.class,
-                "outFilePath=output/AccountCheck",
-                "filePath=output/SplitAccount.xlsx",
+                "outFilePath=output/（美餐巧达）日记账2019年12月",
+                "filePath=data/（美餐巧达）日记账2019年12月.xlsx",
                 "task=AccountCheck",
-                "sheet=基本户");
+                "sheet=基本户&招行-业务端");
     }
 }

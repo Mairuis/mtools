@@ -1,5 +1,9 @@
 package com.mairuis.excel.entity;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,27 +12,42 @@ import java.util.List;
  * @author Mairuis
  * @date 2019/12/16
  */
-public class AccountTree extends Account {
+@Data
+@Accessors(chain = true)
+public class AccountTree {
+    //月
+    private int row;
+    // 借方(收入)
+    private int loan;
+    // 贷方(支出)
+    private int borrow;
+
+    private AccountType type;
 
     private List<Account> children;
+
+    public AccountTree() {
+        this(new ArrayList<>());
+    }
 
     public AccountTree(List<Account> children) {
         this.children = children;
     }
 
-    public boolean check() {
+    public String check() {
+        int cLoan = getChildrenLoan(), cBorrow = getChildrenBorrow();
         if (getLoan() > 0) {
-            if (getChildrenLoan() - getChildrenBorrow() != getLoan()) {
-                throw new IllegalStateException("贷方值错误" + getRow().getRowNum());
+            if (cLoan - cBorrow != getLoan()) {
+                return "贷方值错误";
             }
         } else if (getBorrow() > 0) {
-            if (getChildrenBorrow() - getChildrenLoan() != getBorrow()) {
-                throw new IllegalStateException("借方值错误" + getRow().getRowNum());
+            if (cBorrow - cLoan != getBorrow()) {
+                return "借方值错误";
             }
         } else {
-            throw new IllegalStateException("借方值错误" + getRow().getRowNum());
+            return "借方和贷方值均为零";
         }
-        return true;
+        return null;
     }
 
     public int getChildrenBorrow() {
@@ -37,5 +56,9 @@ public class AccountTree extends Account {
 
     public int getChildrenLoan() {
         return children.stream().mapToInt(Account::getLoan).sum();
+    }
+
+    public void addAccount(Account account) {
+        this.children.add(account);
     }
 }

@@ -50,6 +50,15 @@ public class StringUtils {
         return max;
     }
 
+    public static int tryParseInt(String s, int def) {
+        try {
+            def = Integer.parseInt(s);
+        } catch (Exception ignored) {
+
+        }
+        return def;
+    }
+
     public static String clearByToken(String word, Function<Character, Boolean> tokenStart, Function<Character, Boolean> tokenEnd) {
         Queue<Character> characters = new LinkedList<>();
         for (char chars : word.toCharArray()) {
@@ -79,5 +88,23 @@ public class StringUtils {
             map.put(arg.split("=")[0], arg.split("=")[1]);
         }
         return map;
+    }
+
+    public static double tryParseDouble(String s, double def) {
+        try {
+            def = Double.parseDouble(s);
+        } catch (Exception ignored) {
+
+        }
+        return def;
+    }
+
+    public static float tryParseFloat(String s, float def) {
+        try {
+            def = Float.parseFloat(s);
+        } catch (Exception ignored) {
+
+        }
+        return def;
     }
 }

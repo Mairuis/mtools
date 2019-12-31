@@ -1,5 +1,6 @@
 package com.mairuis.excel.tools.utils;
 
+import com.mairuis.utils.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -59,6 +60,31 @@ public class Cells {
         return getValue(cell, cellType).toString();
     }
 
+    public static double getDoubleValue(Cell cell) {
+        Object value = getValue(cell);
+        if (value == null) {
+            return 0;
+        }
+        if (value instanceof Double) {
+            return (double) value;
+        }
+        return StringUtils.tryParseDouble(value.toString(), 0);
+    }
+
+    public static int getIntValue(Cell cell) {
+        Object value = getValue(cell);
+        if (value == null) {
+            return 0;
+        }
+        if (value instanceof Integer) {
+            return (int) value;
+        }
+        if (value instanceof Double) {
+            return (int)((double) value);
+        }
+        return StringUtils.tryParseInt(value.toString(), 0);
+    }
+
     public static Object getValue(Cell cell) {
         if (cell == null) {
             return null;
@@ -74,14 +100,14 @@ public class Cells {
             case STRING:
                 return String.valueOf(cell.getStringCellValue());
             case BOOLEAN:
-                return Boolean.valueOf(cell.getBooleanCellValue());
+                return cell.getBooleanCellValue();
             case FORMULA: {
                 return getValue(cell, cell.getCachedFormulaResultType());
             }
             case ERROR:
                 return cell.getErrorCellValue();
             case NUMERIC:
-                return Double.valueOf(cell.getNumericCellValue());
+                return cell.getNumericCellValue();
             case BLANK:
             case _NONE:
                 return "";

@@ -21,19 +21,19 @@ import static java.util.stream.Collectors.toList;
 public class ClientMatcher {
 
     private List<String> filterWord;
-    private List<String> client;
-    private Map<Location, List<String>> locationClientMap;
+    private List<Client> client;
+    private Map<Location, List<Client>> locationClientMap;
     private Map<String, List<Location>> clientLocationMap;
+    private Map<String, Client> memory;
 
-    public ClientMatcher(List<String> client, List<String> filterWord, List<String> ignoreWord) {
-        this(client, filterWord, ignoreWord, new HashMap<>());
-    }
-
-    public ClientMatcher(List<String> client, List<String> filterWord, List<String> ignoreWord, Map<String, List<Location>> clientLocationMap) {
+    public ClientMatcher(List<String> client
+            , List<String> filterWord
+            , List<String> ignoreWord
+            , Map<String, Client> memory
+            , List<Client> clients) {
         this.filterWord = filterWord;
-        this.client = client;
-        this.clientLocationMap = clientLocationMap;
-
+        this.client = clients;
+        this.memory = memory;
         this.ignore(client, ignoreWord);
         this.buildLocationMap();
     }
@@ -53,8 +53,8 @@ public class ClientMatcher {
 
     private void buildLocationMap() {
         this.locationClientMap = new HashMap<>();
-        for (String client : client) {
-            List<Location> locations = getLocation(client);
+        for (Client client : client) {
+            List<Location> locations = getLocation(client.getName());
             if (locations.isEmpty()) {
                 locationClientMap.computeIfAbsent(Location.UNKNOWN, x -> new ArrayList<>()).add(client);
             } else {
@@ -78,13 +78,14 @@ public class ClientMatcher {
                 (x) -> x.equals(')') || x.equals('）'));
     }
 
-    private PriorityQueue<MatchResult> scan(String clientNameData, int capacity, List<String> clients) {
+    private PriorityQueue<MatchResult> scan(String clientNameData, int capacity, List<Client> clients) {
         PriorityQueue<MatchResult> queue = new PriorityQueue<>(
                 Comparator.comparingInt((MatchResult x) -> x.similarity)
                         .thenComparingInt(x -> -(Math.abs(clientNameData.length() - x.rawClient.length())))
         );
         String handledClientNameData = filter(clear(clientNameData));
-        for (String clientName : clients) {
+        for (Client client : clients) {
+            String clientName = client.getName();
             String handledClientName = filter(clear(clientName));
             MatchResult matchResult = new MatchResult()
                     .setRawClient(clientName)
@@ -105,6 +106,18 @@ public class ClientMatcher {
     }
 
     private List<MatchResult> match(Location location, String data) {
+        if (memory.containsKey(data)) {
+            return new ArrayList<MatchResult>() {{
+                String clientName = memory.get(data).getName();
+                add(new MatchResult()
+                        .setRawClient(clientName)
+                        .setRawData(data)
+                        .setFilteredClient("")
+                        .setFilteredData("")
+                        .setSimilarity(StringUtils.longestCommonString(data, clientName))
+                        .setDistance(StringUtils.editDistance(clientName, data)));
+            }};
+        }
         List<Location> srcLocation = new ArrayList<>();
         PriorityQueue<MatchResult> queue = new PriorityQueue<>((a, b) -> Integer.compare(b.similarity, a.similarity));
         if (location == null) {
@@ -120,11 +133,7 @@ public class ClientMatcher {
     }
 
     private List<Location> getLocation(String src) {
-        List<Location> locations = clientLocationMap.get(src);
-        if (locations == null || locations.isEmpty()) {
-            locations = MatchUtils.getLocationInString(src);
-        }
-        return locations;
+        return MatchUtils.getLocationInString(src);
     }
 
     @Data
@@ -138,11 +147,18 @@ public class ClientMatcher {
         String filteredClient;
     }
 
+    @Data
+    @Accessors(chain = true)
+    public static class Client {
+        private Location location;
+        private String name;
+    }
+
     public static void main(String[] args) throws IOException {
         List<String> clientList = Files.readAllLines(Paths.get("C:\\Users\\Mairuis\\Desktop\\client.txt"));
         List<String> clientDataList = Files.readAllLines(Paths.get("C:\\Users\\Mairuis\\Desktop\\data.txt"));
         List<String> filterWord = Stream.concat(
-                Stream.of("(", ")", "（", "）", "-", " ", " ", "午餐", "晚餐", "早餐", "中餐", "食堂", "到点晚餐"),
+                Stream.of("(", ")", "（", "）", "-", " ", "午餐", "晚餐", "早餐", "中餐", "食堂", "到点晚餐"),
                 Stream.of(Location.values()).map(Location::getValue)
         ).collect(toList());
         List<String> ignoreWord = Stream.of(

@@ -44,4 +44,13 @@ public class ConsoleExcelWorkerTests {
                 "task=AccountCheck",
                 "sheet=基本户&招行-业务端");
     }
+
+    @Test
+    public void testAccountMatch() {
+        SpringApplication.run(ConsoleExcelWorker.class,
+                "outFilePath=output/（美餐巧达）日记账2019年12月",
+                "filePath=data/（美餐巧达）日记账2019年12月.xlsx",
+                "task=AccountCheck",
+                "sheet=基本户&招行-业务端");
+    }
 }

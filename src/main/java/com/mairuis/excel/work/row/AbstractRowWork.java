@@ -64,7 +64,6 @@ public abstract class AbstractRowWork extends HeaderSheetWork {
         results
                 .entrySet()
                 .stream()
-                .sorted()
                 .map(x -> x.getKey() + " " + x.getValue() + " ")
                 .forEach(x -> resultsInfo.set(x + resultsInfo));
         LOGGER.info("处理 {}/{} 其中 {}", results.values().stream().mapToInt(x -> x).sum(), rowCount, resultsInfo);

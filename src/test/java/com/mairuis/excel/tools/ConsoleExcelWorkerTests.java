@@ -13,11 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = MtoolsApplication.class)
 public class ConsoleExcelWorkerTests {
 
+    String file = "（美餐巧达）日记账2019年12月(12.14-12.31).xlsx";
+    String sheet = "基本户&招行-业务端";
+
     @Test
     public void testMergeAccount() {
         SpringApplication.run(ConsoleExcelWorker.class,
-                "outFilePath=output/MergedAccount",
-                "filePath=data/（美餐巧达）日记账.xlsx",
+                "outFilePath=output/"+file,
+                "filePath=data/"+file,
                 "task=MergeAccount",
                 "source=招行（美餐巧达）",
                 "destination=基本户",
@@ -30,19 +33,19 @@ public class ConsoleExcelWorkerTests {
     @Test
     public void testSplit() {
         SpringApplication.run(ConsoleExcelWorker.class,
-                "outFilePath=output/（美餐巧达）日记账2019年12月",
-                "filePath=data/（美餐巧达）日记账2019年12月.xlsx",
+                "outFilePath=output/"+file,
+                "filePath=data/"+file,
                 "task=AccountSplit",
-                "sheet=基本户&招行-业务端");
+                "sheet="+sheet);
     }
 
     @Test
     public void testAccountCheck() {
         SpringApplication.run(ConsoleExcelWorker.class,
-                "outFilePath=output/（美餐巧达）日记账2019年12月",
-                "filePath=data/（美餐巧达）日记账2019年12月.xlsx",
+                "outFilePath=output/"+file,
+                "filePath=data/"+file,
                 "task=AccountCheck",
-                "sheet=基本户&招行-业务端");
+                "sheet="+sheet);
     }
 
     @Test

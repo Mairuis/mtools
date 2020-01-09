@@ -58,7 +58,7 @@ public class AccountSplit extends AbstractRowWork {
                         if (dates.length != 2) {
                             return "失败";
                         }
-                        if (content.contains("食堂") && values.length >= 6 && values.length <= 9) {
+                        if (values[2].equals("食堂") && values.length >= 6 && values.length <= 9) {
                             //企业订餐-地区-食堂-客户前半段-客户后半段-供应商-(未知)X月X日(未知)-(未知)X月X日(未知)
                             //企业订餐-地区-食堂-客户-供应商-(未知)X月X日(未知)-(未知)X月X日(未知)
                             //企业订餐-地区-食堂-客户-(未知)X月X日(未知)-(未知)X月X日(未知)

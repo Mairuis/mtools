@@ -55,6 +55,15 @@ public enum Location {
 
     UNKNOWN("未知");
 
+    public static Location find(String location) {
+        for (Location location1 : values()) {
+            if (location.equals(location1.getValue())) {
+                return location1;
+            }
+        }
+        return Location.UNKNOWN;
+    }
+
     private String value;
 
     public String getValue() {

@@ -162,4 +162,12 @@ public final class Rows {
         }
         return count;
     }
+
+    public static List<Row> toList(Sheet sheet, int start, int end) {
+        List<Row> clientRowList = new ArrayList<>();
+        for (int i = start; i < end; i += 1) {
+            clientRowList.add(sheet.getRow(i));
+        }
+        return clientRowList;
+    }
 }

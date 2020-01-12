@@ -1,0 +1,86 @@
+package com.mairuis.excel.work.sheet;
+
+import com.mairuis.excel.tools.utils.Cells;
+import com.mairuis.excel.tools.utils.Rows;
+import com.mairuis.excel.work.Worker;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ * 描述
+ *
+ * @author Mairuis
+ * @date 2020/1/12
+ */
+@Worker
+public class AccountGenerate extends SheetWork {
+    @Override
+    public Workbook work(Map<String, String> config, Workbook workbook, Sheet sheet) {
+        String currentMonth = config.get("currentMonth");
+        String currentType = config.get("currentType");
+
+        Rows.ensureColumn(HEADER_NUMBER, sheet, Arrays.asList(new String[]{currentMonth + "冲账", "处理结果"}));
+
+        Map<String, BigDecimal> balanceMap = new HashMap<>();
+        Map<String, Integer> indexMap = Rows.getIndexMap(sheet.getRow(0));
+        Supplier<Stream<Row>> data = () ->
+                Rows.toList(sheet, 1, sheet.getLastRowNum())
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .filter(x -> !Rows.isEmptyRow(x))
+                        .filter(x -> currentType.equals(Cells.toString(x.getCell(indexMap.get("用友账套")))));
+
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        data.get()
+                .filter(x -> Cells.toString(x.getCell(indexMap.get("所属月份"))) != null)
+                .filter(x -> Cells.toString(x.getCell(indexMap.get("所属月份"))).contains(currentMonth))
+                .forEach(x -> {
+                    String supplierName = Cells.toString(x.getCell(indexMap.get("供应商名称")));
+                    BigDecimal balance = new BigDecimal(decimalFormat.format(Cells.getDoubleValue(x.getCell(indexMap.get("预付款余额")))));
+                    if (balanceMap.containsKey(supplierName) && balanceMap.get(supplierName).compareTo(balance) != 0) {
+                        LOGGER.error("行 {} 供应商 {} 余额错误，余额不是同一值", x.getRowNum(), supplierName);
+                        System.exit(0);
+                    }
+                    balanceMap.put(supplierName, balance);
+                });
+        data.get()
+                .filter(x -> balanceMap.containsKey(Cells.toString(x.getCell(indexMap.get("供应商名称")))))
+                .collect(Collectors.groupingBy(x -> Cells.toString(x.getCell(indexMap.get("供应商名称")))))
+                .forEach((supplier, b) -> {
+                    BigDecimal balance = balanceMap.get(supplier);
+
+                    for (Row x : b) {
+                        BigDecimal price = new BigDecimal(decimalFormat.format(Cells.getDoubleValue(x.getCell(indexMap.get("餐厅结算款")))));
+                        if (Cells.isEmpty(x.getCell(indexMap.get("已冲账金额")))) {
+                            if (balance.compareTo(price) >= 0) {
+                                Cells.writeCell(x, indexMap.get("已冲账金额"), price.doubleValue());
+                                Cells.writeCell(x, indexMap.get("冲账日期"), currentMonth);
+                                balance = balance.subtract(price);
+                            } else {
+                                Cells.writeCell(x, indexMap.get("已冲账金额"), balance);
+                                Cells.writeCell(x, indexMap.get("冲账日期"), currentMonth);
+                                balance = new BigDecimal(0);
+                            }
+                        } else {
+                            Object rechargeDate = Cells.getValue(x.getCell(indexMap.get("冲账日期")));
+
+                        }
+                    }
+                });
+
+
+        return workbook;
+    }
+}

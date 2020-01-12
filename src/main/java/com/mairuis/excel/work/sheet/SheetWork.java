@@ -15,7 +15,7 @@ public abstract class SheetWork implements WorkbookTask {
     public final Workbook work(Map<String, String> config, Workbook workbook) {
         Sheet sheet = workbook.getSheet(config.get("sheet"));
         if (sheet == null) {
-            throw new NullPointerException("Sheet" + config.get("sheet") + "不存在");
+            throw new NullPointerException("表 " + config.get("sheet") + "不存在");
         }
         this.initialize(config, workbook, sheet);
         return this.work(config, workbook, sheet);
@@ -30,5 +30,7 @@ public abstract class SheetWork implements WorkbookTask {
      * @param workbook
      * @param src
      */
-    public abstract void initialize(Map<String, String> config, Workbook workbook, Sheet src);
+    public void initialize(Map<String, String> config, Workbook workbook, Sheet src) {
+
+    }
 }

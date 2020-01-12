@@ -81,10 +81,4 @@ public class AccountMatch extends AbstractRowWork {
         this.addHeader("客户编码");
         this.addHeader("候选用友客户名");
     }
-
-
-    @Override
-    public void initialize(Map<String, String> config, Workbook workbook, Sheet src) {
-
-    }
 }

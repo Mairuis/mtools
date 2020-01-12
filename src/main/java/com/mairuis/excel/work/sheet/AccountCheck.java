@@ -66,9 +66,4 @@ public class AccountCheck extends HeaderSheetWork {
         }
         return workbook;
     }
-
-    @Override
-    public void initialize(Map<String, String> config, Workbook workbook, Sheet src) {
-
-    }
 }

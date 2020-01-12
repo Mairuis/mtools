@@ -134,11 +134,11 @@ public class AccountSplit extends AbstractRowWork {
                         if (values.length == 4) {
                             write.put("城市", values[1]);
                             write.put("事项", accountType.getName());
-                            write.put("供应商", values[3]);
+                            write.put("供应商", values[2]);
                         } else if (values.length == 5) {
                             write.put("城市", values[1]);
                             write.put("事项", accountType.getName());
-                            write.put("供应商", values[2]);
+                            write.put("供应商", values[3]);
                         } else {
                             return "失败";
                         }
@@ -146,10 +146,5 @@ public class AccountSplit extends AbstractRowWork {
                     }
                 }
         };
-    }
-
-    @Override
-    public void initialize(Map<String, String> config, Workbook workbook, Sheet src) {
-
     }
 }

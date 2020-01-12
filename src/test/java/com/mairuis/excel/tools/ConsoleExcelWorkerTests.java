@@ -13,8 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = MtoolsApplication.class)
 public class ConsoleExcelWorkerTests {
 
-    String file = "（美餐巧达）日记账2019年12月(12.14-12.31).xlsx";
-    String sheet = "基本户&招行-业务端";
+    String file = "（美餐巧达）日记账2019年12月(12.14-12.31)-税务帐----.xlsx";
+    String sheet = "-渣打&招行-业务端";
 
     @Test
     public void testMergeAccount() {
@@ -55,5 +55,16 @@ public class ConsoleExcelWorkerTests {
                 "filePath=data/（美餐巧达）日记账2019年12月(12.14-12.31)-税务帐----.xlsx",
                 "task=AccountMatch",
                 "sheet=基本户&招行-业务端");
+    }
+
+    @Test
+    public void testAccountGenerate() {
+        SpringApplication.run(ConsoleExcelWorker.class,
+                "outFilePath=output/预付冲应付入账明细表-巧达&好客&造物-1911-新(1)",
+                "filePath=data/预付冲应付入账明细表-巧达&好客&造物-1911-新(1).xlsx",
+                "task=AccountGenerate",
+                "currentMonth=201912",
+                "currentType=造物",
+                "sheet=汇总表-1911");
     }
 }

@@ -62,7 +62,7 @@ public class ConsoleExcelWorkerTests {
         SpringApplication.run(ConsoleExcelWorker.class,
                 "outFilePath=output/预付冲应付入账明细表-巧达&好客&造物-1911-新(1)",
                 "filePath=data/预付冲应付入账明细表-巧达&好客&造物-1911-新(1).xlsx",
-                "task=AccountGenerate",
+                "task=AccountCompletion",
                 "currentMonth=201912",
                 "currentType=造物",
                 "sheet=汇总表-1911");

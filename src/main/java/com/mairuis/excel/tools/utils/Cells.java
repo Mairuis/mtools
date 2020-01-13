@@ -80,7 +80,7 @@ public class Cells {
             return (int) value;
         }
         if (value instanceof Double) {
-            return (int)((double) value);
+            return (int) ((double) value);
         }
         return StringUtils.tryParseInt(value.toString(), 0);
     }
@@ -144,4 +144,11 @@ public class Cells {
         return value == null || (value instanceof String && "".equals(((String) value).trim()));
     }
 
+    public static void writeFormula(Cell cell, String s) {
+        cell.setCellFormula(s);
+    }
+
+    public static void writeFormula(Row row, int index, String s) {
+        writeFormula(getOrCreate(row, index), s);
+    }
 }

@@ -3,9 +3,7 @@ package com.mairuis.excel.work.sheet;
 import com.mairuis.excel.tools.utils.Cells;
 import com.mairuis.excel.tools.utils.Rows;
 import com.mairuis.excel.work.Worker;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -14,18 +12,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * 描述
+ * 账目补全
  *
  * @author Mairuis
  * @date 2020/1/12
  */
 @Worker
-public class AccountGenerate extends SheetWork {
+public class AccountCompletion extends SheetWork {
     @Override
     public Workbook work(Map<String, String> config, Workbook workbook, Sheet sheet) {
         String currentMonth = config.get("currentMonth");
@@ -57,30 +54,45 @@ public class AccountGenerate extends SheetWork {
                 });
         data.get()
                 .filter(x -> balanceMap.containsKey(Cells.toString(x.getCell(indexMap.get("供应商名称")))))
+                .filter(x -> new BigDecimal(decimalFormat.format(Cells.getDoubleValue(x.getCell(indexMap.get("余额"))))).intValue() > 0)
                 .collect(Collectors.groupingBy(x -> Cells.toString(x.getCell(indexMap.get("供应商名称")))))
                 .forEach((supplier, b) -> {
                     BigDecimal balance = balanceMap.get(supplier);
-
                     for (Row x : b) {
                         BigDecimal price = new BigDecimal(decimalFormat.format(Cells.getDoubleValue(x.getCell(indexMap.get("餐厅结算款")))));
                         if (Cells.isEmpty(x.getCell(indexMap.get("已冲账金额")))) {
                             if (balance.compareTo(price) >= 0) {
-                                Cells.writeCell(x, indexMap.get("已冲账金额"), price.doubleValue());
+                                Cells.writeCell(x, indexMap.get("已冲账金额"), decimalFormat.format(price));
                                 Cells.writeCell(x, indexMap.get("冲账日期"), currentMonth);
                                 balance = balance.subtract(price);
                             } else {
-                                Cells.writeCell(x, indexMap.get("已冲账金额"), balance);
+                                Cells.writeCell(x, indexMap.get("已冲账金额"), decimalFormat.format(balance));
                                 Cells.writeCell(x, indexMap.get("冲账日期"), currentMonth);
-                                balance = new BigDecimal(0);
+                                break;
                             }
                         } else {
-                            Object rechargeDate = Cells.getValue(x.getCell(indexMap.get("冲账日期")));
-
+                            //XXXX年X月
+                            String rechargeDate = Cells.toString(x.getCell(indexMap.get("冲账日期")));
+                            if (rechargeDate.length() != 7) {
+                                LOGGER.warn("放弃处理 {} 行", x.getRowNum());
+                                break;
+                            } else {
+                                Cell prevRechargeCell = x.getCell(indexMap.get("已冲账金额"));
+                                BigDecimal prevRecharge = new BigDecimal(decimalFormat.format(Cells.getDoubleValue(prevRechargeCell)));
+                                BigDecimal addRecharge = price.subtract(prevRecharge);
+                                if (balance.compareTo(addRecharge) >= 0) {
+                                    Cells.writeFormula(prevRechargeCell, decimalFormat.format(prevRecharge) + "+" + decimalFormat.format(addRecharge));
+                                    Cells.writeCell(prevRechargeCell, rechargeDate + "-" + currentMonth);
+                                    balance = balance.subtract(addRecharge);
+                                } else {
+                                    Cells.writeFormula(prevRechargeCell, decimalFormat.format(prevRecharge) + "+" + decimalFormat.format(balance));
+                                    Cells.writeCell(prevRechargeCell, rechargeDate + "-" + currentMonth);
+                                    break;
+                                }
+                            }
                         }
                     }
                 });
-
-
         return workbook;
     }
 }

@@ -22,14 +22,7 @@ public class Workbooks {
     static Logger LOGGER = LoggerFactory.getLogger(Workbooks.class);
 
     public static void writeToFile(Workbook workbook, String fileName) {
-        String suffix = ".error";
-        if (workbook instanceof HSSFWorkbook) {
-            suffix = ".xls";
-        } else if (workbook instanceof SXSSFWorkbook || workbook instanceof XSSFWorkbook) {
-            suffix = ".xlsx";
-        }
-        File outFile = new File(fileName + suffix);
-        writeToFile(workbook, outFile);
+        writeToFile(workbook, new File(fileName));
     }
 
     public static void writeToFile(Workbook workbook, File file) {

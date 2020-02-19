@@ -33,4 +33,8 @@ public interface RowVisitor {
     default String visit(Map<String, String> config, Map<String, Integer> headerIndex, Workbook workbook, Sheet sheet, Row row) throws Throwable {
         return null;
     }
+
+    default void init(Map<String, String> config, Workbook workbook, Sheet sheet) {
+
+    }
 }

@@ -41,6 +41,9 @@ public class StringUtils {
     public static int longestCommonString(String wa, String wb) {
         int max = 0;
         int[][] dp = new int[wa.length()][wb.length()];
+        if (wa.length() > 0 && wb.length() > 0) {
+            max = dp[0][0] = wa.charAt(0) == wb.charAt(0) ? 1 : 0;
+        }
         for (int i = 1; i < wa.length(); i += 1) {
             for (int j = 1; j < wb.length(); j += 1) {
                 dp[i][j] = wa.charAt(i - 1) == wb.charAt(j - 1) ? dp[i - 1][j - 1] + 1 : 0;

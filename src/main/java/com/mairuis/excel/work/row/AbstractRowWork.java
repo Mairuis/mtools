@@ -29,6 +29,7 @@ public abstract class AbstractRowWork extends HeaderSheetWork {
     public Workbook headerSheetWork(Map<String, String> config, Workbook workbook, Sheet sheet) {
         Map<String, Integer> results = new HashMap<>();
         int rowCount = Sheets.getRowCount(sheet);
+        rowVisitorList.forEach((visitor) -> visitor.init(config, workbook, sheet));
         rowVisitorList.forEach((visitor) -> {
             Map<String, Integer> headerMap = Rows.getIndexMap(sheet.getRow(HEADER_NUMBER));
             for (int i = CONTENT_START_NUMBER; i < sheet.getLastRowNum(); i += 1) {

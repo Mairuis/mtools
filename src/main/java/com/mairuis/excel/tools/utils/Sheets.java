@@ -22,12 +22,13 @@ public class Sheets {
     }
 
     public static int getRowCount(Sheet sheet) {
-        for (int i = CONTENT_START_NUMBER; i < sheet.getLastRowNum(); i += 1) {
-            Row row = sheet.getRow(i);
+        int i = 0;
+        for (; CONTENT_START_NUMBER + i < sheet.getLastRowNum(); i += 1) {
+            Row row = sheet.getRow(CONTENT_START_NUMBER + i);
             if (row == null || Rows.isEmptyRow(row)) {
                 return i + 1;
             }
         }
-        return 0;
+        return i;
     }
 }

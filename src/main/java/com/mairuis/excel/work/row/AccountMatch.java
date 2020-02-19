@@ -1,12 +1,12 @@
 package com.mairuis.excel.work.row;
 
-import com.alibaba.fastjson.JSON;
 import com.mairuis.excel.entity.Location;
 import com.mairuis.excel.tools.client.ClientDatabase;
 import com.mairuis.excel.tools.client.ClientMatcher;
 import com.mairuis.excel.tools.client.MatchInfo;
 import com.mairuis.excel.tools.utils.Cells;
 import com.mairuis.excel.work.Worker;
+import com.mairuis.utils.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -31,9 +31,11 @@ public class AccountMatch extends AbstractRowWork {
 
     public AccountMatch() {
         super(new RowVisitor() {
-            ClientMatcher matcher;
+            private ClientMatcher matcher;
 
-            {
+
+            @Override
+            public void init(Map<String, String> config, Workbook workbook, Sheet sheet) {
                 List<String> filterWord = Stream.concat(
                         Stream.of("(", ")", "（", "）", "-", " ", "午餐", "晚餐", "早餐", "中餐", "食堂", "到点晚餐"),
                         Stream.of(Location.values()).map(Location::getValue)
@@ -41,7 +43,7 @@ public class AccountMatch extends AbstractRowWork {
                 try {
                     this.matcher = new ClientMatcher(filterWord
                             , ClientDatabase.createByWorkbook(
-                            WorkbookFactory.create(new File("data\\客户数据.xlsx"))));
+                            WorkbookFactory.create(new File(config.get("clientData")))));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -62,13 +64,12 @@ public class AccountMatch extends AbstractRowWork {
                     Cells.writeCell(row, headerIndex.get("用友客户"), similar.getClient().getName());
                     Cells.writeCell(row, headerIndex.get("匹配依据"), similar.getType());
                     Cells.writeCell(row, headerIndex.get("客户编码"), similar.getClient().getCode());
-                    Cells.writeCell(row, headerIndex.get("客户名距离"), similar.getDistance());
+                    Cells.writeCell(row, headerIndex.get("客户名距离"), StringUtils.editDistance(similar.getRawClient(), similar.getRawData()));
                     Cells.writeCell(row, headerIndex.get("候选用友客户名"),
                             matchInfo.stream()
                                     .filter(x -> x != similar)
                                     .map(x -> x.getClient().getName())
                                     .reduce("", (a, b) -> a + "||" + b));
-
                 } else {
                     return "失败";
                 }

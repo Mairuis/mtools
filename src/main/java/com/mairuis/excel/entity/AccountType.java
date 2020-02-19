@@ -18,6 +18,10 @@ public enum AccountType {
     押金("押金"),
     //回款
     回款("回款"),
+
+    在线支付("在线支付"),
+
+    保洁费("保洁费"),
     UNKNOWN("未知");
 
     private String[] v;

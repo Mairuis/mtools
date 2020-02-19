@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * @author Mairuis
@@ -15,7 +16,19 @@ public abstract class SheetWork implements WorkbookTask {
     public final Workbook work(Map<String, String> config, Workbook workbook) {
         Sheet sheet = workbook.getSheet(config.get("sheet"));
         if (sheet == null) {
-            throw new NullPointerException("表 " + config.get("sheet") + "不存在");
+            if (CONSOLE_MODE) {
+                Scanner scanner = new Scanner(System.in);
+                LOGGER.warn("表 " + config.get("sheet") + "不存在");
+                LOGGER.info("表清单: ");
+                workbook.forEach((sheet1 -> LOGGER.info(sheet1.getSheetName())));
+                while (sheet == null) {
+                    LOGGER.info("请输入表名");
+                    String tableName = scanner.nextLine();
+                    sheet = workbook.getSheet(tableName);
+                }
+            } else {
+                throw new NullPointerException("表 " + config.get("sheet") + "不存在");
+            }
         }
         this.initialize(config, workbook, sheet);
         return this.work(config, workbook, sheet);

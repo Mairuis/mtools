@@ -59,7 +59,7 @@ public class ClientMatcher {
                     .setClient(client)
                     .setFilteredData(handledClientNameData)
                     .setSimilarity(StringUtils.longestCommonString(handledClientNameData, handledClientName))
-                    .setDistance(StringUtils.editDistance(handledClientName, handledClientNameData));
+                    .setDistance(StringUtils.editDistance(handledClientName.toLowerCase(), handledClientNameData.toLowerCase()));
             //如果只有一个字相符就直接过滤掉
             if (matchInfo.getSimilarity() > 1) {
                 queue.add(matchInfo);

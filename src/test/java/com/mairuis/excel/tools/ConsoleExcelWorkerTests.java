@@ -13,8 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = MtoolsApplication.class)
 public class ConsoleExcelWorkerTests {
 
-    private String file = "（美餐巧达）日记账2020年1月 （1.20-1-31）-管理帐 -业务端 - 副本.xlsx";
-    private String sheet = "巧达渣打&招商业务端";
+    private String file = "预付冲应付入账明细表-1912(1).xlsx";
+    private String sheet = "汇总表-1711-1912";
     private String document = "客户匹配表-巧达管理.xlsx";
 
     @Test
@@ -60,12 +60,12 @@ public class ConsoleExcelWorkerTests {
     }
 
     @Test
-    public void testAccountGenerate() {
+    public void testAccountCompletion() {
         SpringApplication.run(ConsoleExcelWorker.class,
-                "outFilePath=output/预付冲应付入账明细表-巧达&好客&造物-1911-新-2020-1-13",
-                "filePath=data/预付冲应付入账明细表-巧达&好客&造物-1911-新-2020-1-13.xlsx",
+                "outFilePath=output/" + file,
+                "filePath=data/" + file,
                 "task=AccountCompletion",
-                "currentMonth=201912",
+                "currentMonth=202001",
                 "sheet=" + sheet);
     }
 }

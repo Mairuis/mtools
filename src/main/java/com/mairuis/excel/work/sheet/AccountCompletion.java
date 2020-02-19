@@ -30,13 +30,13 @@ public class AccountCompletion extends SheetWork {
     public Workbook work(Map<String, String> config, Workbook workbook, Sheet sheet) {
         String currentMonth = config.get("currentMonth");
 
-        Rows.ensureColumn(HEADER_NUMBER, sheet, Arrays.asList(new String[]{currentMonth + "冲账", "处理结果"}));
+        Rows.ensureColumn(HEADER_NUMBER, sheet, Arrays.asList(currentMonth + "冲账", "处理结果"));
         Stream.of("好客", "巧达", "造物")
                 .forEach(currentType -> {
                     Map<String, BigDecimal> balanceMap = new HashMap<>();
-                    Map<String, Integer> indexMap = Rows.getIndexMap(sheet.getRow(0));
+                    Map<String, Integer> indexMap = Rows.getIndexMap(sheet.getRow(HEADER_NUMBER));
                     Supplier<Stream<Row>> data = () ->
-                            Rows.toList(sheet, 1, sheet.getLastRowNum())
+                            Rows.toList(sheet, CONTENT_START_NUMBER, sheet.getLastRowNum())
                                     .stream()
                                     .filter(Objects::nonNull)
                                     .filter(x -> !Rows.isEmptyRow(x))

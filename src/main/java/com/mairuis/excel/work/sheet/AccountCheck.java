@@ -41,8 +41,10 @@ public class AccountCheck extends HeaderSheetWork {
                 }
                 tree.addAccount(new Account()
                         .setRow(row.getRowNum())
-                        .setLoan(new BigDecimal(df.format(Cells.getDoubleValue(row.getCell(4)))).multiply(new BigDecimal(100)).intValue())
-                        .setBorrow(new BigDecimal(df.format(Cells.getDoubleValue(row.getCell(5)))).multiply(new BigDecimal(100)).intValue())
+                        .setLoan(new BigDecimal(df.format(Cells.getDoubleValue(row.getCell(4))))
+                                .multiply(new BigDecimal(100)).intValue())
+                        .setBorrow(new BigDecimal(df.format(Cells.getDoubleValue(row.getCell(5))))
+                                .multiply(new BigDecimal(100)).intValue())
                 );
             } else {
                 accountList.add(
